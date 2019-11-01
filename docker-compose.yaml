@@ -1,0 +1,49 @@
+version: '3.7'
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.0.0.10/24
+
+services:
+  n1:
+    container_name: n1
+    build:
+      context: ./n1
+    environment:
+      - RECEIVER="tcp://172.0.0.11:3000"
+    command: node src/receiver.js
+    volumes:
+      - ./n1/package.json:/home/n1/package.json
+      - ./n1/src:/home/n1/src
+    networks:
+      default:
+        ipv4_address: 172.0.0.11
+  n2:
+    container_name: n2
+    build:
+      context: ./n2
+    environment:
+      - RECEIVER="tcp://172.0.0.11:3000"
+    command: node src/sender.js
+    volumes:
+      - ./n2/package.json:/home/n2/package.json
+      - ./n2/src:/home/n2/src
+    networks:
+      default:
+        ipv4_address: 172.0.0.12
+  n3:
+    container_name: n3
+    build:
+      context: ./n3
+    environment:
+      - RECEIVER="tcp://172.0.0.11:3000"
+    command: node src/sender.js
+    volumes:
+      - ./n2/package.json:/home/n2/package.json
+      - ./n2/src:/home/n2/src
+    networks:
+      default:
+        ipv4_address: 172.0.0.13
